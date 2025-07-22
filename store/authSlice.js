@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import STATUSES from "../src/globals/status/statuses";
+import API from "../src/http";
 
 const authSlice = createSlice({
   name: "auth",
@@ -21,18 +21,15 @@ const authSlice = createSlice({
     },
   },
 });
-
 export const { setStatus, setUser, setToken } = authSlice.actions;
 export default authSlice.reducer;
 
+//register
 export function register(data) {
   return async function registerThunk(dispatch) {
     dispatch(setStatus(STATUSES.LOADING));
     try {
-      const response = await axios.post(
-        "https://react30.onrender.com/api/user/register",
-        data
-      );
+      const response = await API.post("register", data);
       if (response.status === 201) {
         dispatch(setUser(data));
         dispatch(setStatus(STATUSES.SUCCESS));
@@ -43,20 +40,18 @@ export function register(data) {
       dispatch(setStatus(STATUSES.ERROR));
     }
   };
+  v;
 }
-
+//login
 export function login(data) {
   return async function loginThunk(dispatch) {
     dispatch(setStatus(STATUSES.LOADING));
     try {
-      const response = await axios.post(
-        "https://react30.onrender.com/api/user/login",
-        data
-      );
-
+      console.log(data);
+      const response = await API.post("login", data);
       if (response.status === 200 && response.data.token) {
         dispatch(setToken(response?.data.token));
-        dispatch(setStatus(STATUSES.SUCESS));
+        dispatch(setStatus(STATUSES.SUCCESS));
       } else {
         dispatch(setStatus(STATUSES.ERROR));
       }
