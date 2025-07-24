@@ -5,34 +5,38 @@ import API from "../src/http";
 const blogSlice = createSlice({
   name: "blog",
   initialState: {
-    data: null,
+    data: [],
     status: null,
+    editStatus: null,
   },
   reducers: {
     setStatus(state, action) {
       state.status = action.payload;
     },
     setBlog(state, action) {
-      state.blog = action.payload;
+      state.data = action.payload;
+    },
+    setEditStatus(state, action) {
+      state.editStatus = action.payload;
     },
   },
 });
-export const { setStatus, setBlog } = blogSlice.actions;
+export const { setStatus, setBlog, setEditStatus } = blogSlice.actions;
 export default blogSlice.reducer;
-
-//add blog
+//addblog
 export function addBlog(data) {
   return async function addBlogThunk(dispatch) {
     dispatch(setStatus(STATUSES.LOADING));
     try {
-      const response = await API.get("blog", data, {
+      const response = await API.post("blog", data, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: localStorage.getItem("token"),
         },
       });
-
       if (response.status === 201) {
         dispatch(setStatus(STATUSES.SUCCESS));
+        return true;
       } else {
         dispatch(setStatus(STATUSES.ERROR));
       }
@@ -41,16 +45,19 @@ export function addBlog(data) {
     }
   };
 }
-//fetchblog
+
+//fetch
+
 export function fetchBlog() {
   return async function fetchBlogThunk(dispatch) {
     dispatch(setStatus(STATUSES.LOADING));
     try {
       const response = await API.get("blog");
-      if (response.status === 200 && response.data.blog.length > 0) {
-        dispatch(setBlog(response.data.blog));
+      if (response.status === 200 && response.data.data?.length > 0) {
+        dispatch(setBlog(response.data.data));
         dispatch(setStatus(STATUSES.SUCCESS));
       } else {
+        dispatch(setBlog([]));
         dispatch(setStatus(STATUSES.ERROR));
       }
     } catch (error) {
@@ -59,20 +66,58 @@ export function fetchBlog() {
   };
 }
 
-//delete blog
+// Delete blog
 export function deleteBlog(id, token) {
   return async function deleteBlogThunk(dispatch) {
     dispatch(setStatus(STATUSES.LOADING));
     try {
       const response = await API.delete(`blog/${id}`, {
         headers: {
-          token: token,
+          Authorization: token,
         },
       });
       if (response.status === 200) {
         dispatch(setStatus(STATUSES.SUCCESS));
       } else {
         dispatch(setStatus(STATUSES.ERROR));
+      }
+    } catch (error) {
+      dispatch(setStatus(STATUSES.ERROR));
+    }
+  };
+}
+export function getSingleBlog(id) {
+  return async function getSingleBlogThunk(dispatch) {
+    dispatch(setStatus(STATUSES.LOADING));
+    try {
+      const response = await API.get(`blog/${id}`);
+      if (response.status === 200) {
+        dispatch(setBlog([response.data.data])); // wrap in array for reuse
+        dispatch(setStatus(STATUSES.SUCCESS));
+      } else {
+        dispatch(setStatus(STATUSES.ERROR));
+      }
+    } catch (error) {
+      dispatch(setStatus(STATUSES.ERROR));
+    }
+  };
+}
+
+//edit
+export function editBlog(blog, id) {
+  return async function editBlogThunk(dispatch) {
+    dispatch(setStatus(STATUSES.LOADING));
+    try {
+      const response = await API.patch(`blog/${id}`, blog, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization ": localStorage.getItem("token"),
+        },
+      });
+      if (response.status === 200) {
+        dispatch(setEditStatus(true));
+      } else {
+        dispatch(setEditStatus(null));
       }
     } catch (error) {
       dispatch(setStatus(STATUSES.ERROR));
