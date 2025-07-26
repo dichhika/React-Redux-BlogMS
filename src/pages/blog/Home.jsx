@@ -6,17 +6,33 @@ import { fetchBlog } from "../../../store/blogSlice";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { data } = useSelector((state) => state.blog);
 
+  // Get blog data and search query from Redux store
+  const { data: blogs } = useSelector((state) => state.blog);
+  const searchQuery = useSelector((state) => state.search.query);
+
+  // Fetch all blogs when the component mounts
   useEffect(() => {
     dispatch(fetchBlog());
   }, [dispatch]);
 
+  // Filter blogs by title or author name (case-insensitive)
+  const filteredBlogs = blogs?.filter((blog) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      blog.title.toLowerCase().includes(query) ||
+      blog.userId?.username?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <Layout>
       <div className="flex flex-wrap justify-center mt-6 gap-5 px-4">
-        {data?.length > 0 &&
-          data.map((blog, index) => <Card blog={blog} key={index} />)}
+        {filteredBlogs?.length > 0 ? (
+          filteredBlogs.map((blog, index) => <Card blog={blog} key={index} />)
+        ) : (
+          <p className="text-gray-500 text-xl mt-10">No blogs found.</p>
+        )}
       </div>
     </Layout>
   );

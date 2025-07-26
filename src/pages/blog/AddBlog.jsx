@@ -20,7 +20,7 @@ const AddBlog = () => {
   };
   useEffect(() => {
     // check the status value
-    // status--> success -> navigate to login else register page
+
     if (status === STATUSES.SUCCESS) {
       dispatch(setStatus(null));
     }

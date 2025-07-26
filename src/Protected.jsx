@@ -7,10 +7,11 @@ const Protected = ({ children }) => {
   const isAuthenticated = token || localStorage.getItem("jwt");
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    alert("Please login first!");
+    return <Navigate to="/login" replace />;
   }
 
-  return children; // ✅ Correct: return JSX
+  return children;
 };
 
 export default Protected;
