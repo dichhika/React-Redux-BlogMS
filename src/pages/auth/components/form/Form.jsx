@@ -18,8 +18,14 @@ const Form = ({ type, onSubmit, user }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(data);
+
+    // Only send relevant fields based on type
+    const payload =
+      type === "Login" ? { email: data.email, password: data.password } : data;
+
+    onSubmit(payload);
   };
+
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
       <div className="relative py-3 sm:max-w-xl sm:mx-auto w-full px-4 sm:px-6">
@@ -35,11 +41,13 @@ const Form = ({ type, onSubmit, user }) => {
                 ? "Login here to continue..."
                 : "Register here to continue..."}
             </h1>
+
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email Field */}
               <div className="relative">
                 <input
                   autoComplete="off"
-                  id="email"
+                  id={`${type}-email`}
                   name="email"
                   type="text"
                   className="peer placeholder-transparent h-10 w-full max-w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-cyan-600"
@@ -48,7 +56,7 @@ const Form = ({ type, onSubmit, user }) => {
                   required
                 />
                 <label
-                  htmlFor="email"
+                  htmlFor={`${type}-email`}
                   className="absolute left-0 -top-3.5 text-gray-600 text-sm
                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440
                              peer-placeholder-shown:top-2 transition-all
@@ -58,11 +66,12 @@ const Form = ({ type, onSubmit, user }) => {
                 </label>
               </div>
 
+              {/* Username Field (Only for Register) */}
               {type === "Register" && (
                 <div className="relative">
                   <input
                     autoComplete="off"
-                    id="username"
+                    id={`${type}-username`}
                     name="username"
                     type="text"
                     className="peer placeholder-transparent h-10 w-full max-w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-cyan-600"
@@ -71,7 +80,7 @@ const Form = ({ type, onSubmit, user }) => {
                     required
                   />
                   <label
-                    htmlFor="username"
+                    htmlFor={`${type}-username`}
                     className="absolute left-0 -top-3.5 text-gray-600 text-sm
                                peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440
                                peer-placeholder-shown:top-2 transition-all
@@ -82,10 +91,11 @@ const Form = ({ type, onSubmit, user }) => {
                 </div>
               )}
 
+              {/* Password Field */}
               <div className="relative">
                 <input
                   autoComplete="off"
-                  id="password"
+                  id={`${type}-password`}
                   name="password"
                   type="password"
                   className="peer placeholder-transparent h-10 w-full max-w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-cyan-600"
@@ -94,7 +104,7 @@ const Form = ({ type, onSubmit, user }) => {
                   required
                 />
                 <label
-                  htmlFor="password"
+                  htmlFor={`${type}-password`}
                   className="absolute left-0 -top-3.5 text-gray-600 text-sm
                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440
                              peer-placeholder-shown:top-2 transition-all
@@ -104,6 +114,7 @@ const Form = ({ type, onSubmit, user }) => {
                 </label>
               </div>
 
+              {/* Submit Button */}
               <div className="relative">
                 <button
                   type="submit"
@@ -113,6 +124,8 @@ const Form = ({ type, onSubmit, user }) => {
                 </button>
               </div>
             </form>
+
+            {/* Toggle Link */}
             <div className="mt-6 text-center">
               {type === "Register" ? (
                 <Link to="/login" className="text-cyan-600 hover:underline">
